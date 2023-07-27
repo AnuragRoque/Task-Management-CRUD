@@ -4,125 +4,147 @@
     <title>Task Management</title>
     <style>
         body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-}
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-h1 {
-    color: #333;
-}
+        .container {
+            max-width: 800px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
 
-form {
-    margin-bottom: 20px;
-}
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-}
+        h2 {
+            color: #333;
+            margin-bottom: 15px;
+        }
 
-input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-}
+        form {
+            display: flex;
+            flex-direction: column;
+        }
 
-button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-}
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
 
-ul {
-    list-style: none;
-}
+        input[type="text"],
+        input[type="date"] {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 300px;
+        }
 
-li {
-    margin-bottom: 5px;
-}
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
 
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            transition: background-color 0.3s ease;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Hover effect for table rows */
+        tr:hover {
+            background-color: #f8f8f8;
+        }
     </style>
 </head>
 <body>
-    <h1>Task Management</h1>
+    
 
-    <h2>Add New Task </h2>
-    <form id="addtaskForm">
-        <label for="taskname">Task Name:</label>
-        <input type="text" id="taskname" name="taskname" required>
-        <br><br>
-        <label for="taskpriority">Task Priority (1 - 10):</label>
-        <input type="text" id="taskpriority" name="taskpriority" required>
-        <br><br>
-        <label for="date">Date:</label>
-        <input type="date" id="date" name="date" required>
-        <br><br>
-        <button type="submit">Add Task</button>
-    </form>
+    <div class="container">
+        <div class="container">
+            <h1>Task Management</h1>
+            </div>
+        <!-- <h1>Task Management</h1> -->
+        <h2>Add New Task</h2>
+        <form id="addtaskForm">
+            <label for="taskname">Task Name:</label>
+            <input type="text" id="taskname" name="taskname" required>
+            <label for="taskpriority">Task Priority (1 - 10):</label>
+            <input type="text" id="taskpriority" name="taskpriority" required>
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+            <button type="submit">Add Task</button>
+        </form>
 
-    <h2>List of Tasks</h2>
-    <ul id="taskList"></ul>
+        <h2>List of Tasks</h2>
+        <table id="taskList">
+            <thead>
+                <tr>
+                    <th>Task Priority</th>
+                    <th>Task Name</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Each task will be added here dynamically -->
+            </tbody>
+        </table>
+    </div>
 
     <script>
-        document.getElementById("addtaskForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-    
-            // Get form data
-            const formData = new FormData(event.target);
-            const taskname = formData.get("taskname");
-            const taskpriority = formData.get("taskpriority");
-            const date = formData.get("date");
-    
-            // Create a new employee object
-            const newTask = {
-                taskname: taskname,
-                taskpriority: taskpriority,
-                date: date
-            };
-    
-            
-            fetch('/api/taskmanage/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(newTask)
-            })
-            .then(response => response.json())
-            .then(data => {
-                // If successful, reload the employee list
-                if (data.id) {
-                    fetchTaskList();
-                    document.getElementById("addTaskForm").reset();
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    
-        // Function to fetch and display the list of employees
-        function fetchTaskList() {
-            fetch('/api/taskmanage/')
-            .then(response => response.json())
-            .then(data => {
-                const taskList = document.getElementById("taskList");
-                taskList.innerHTML = "";
-    
-                data.forEach(task => {
-                    const li = document.createElement("li");
-                    li.textContent = `Priority:  ${task.taskpriority}, Task Name: ${task.taskname} , Date: ${task.date}`;
-                    taskList.appendChild(li);
-                });
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    
-        // Fetch and display the initial list of employees
+        /* Your existing JavaScript code here */
 
         function createDeleteButton(taskId) {
             const deleteButton = document.createElement("button");
             deleteButton.textContent = "Delete Task";
+            deleteButton.className = "delete-btn";
             deleteButton.addEventListener("click", function() {
                 deleteTask(taskId);
             });
@@ -141,16 +163,75 @@ li {
             .catch(error => console.error('Error:', error));
         }
 
-        function createTaskElement(task) {
-            const li = document.createElement("li");
-            li.textContent = `Priority:  ${task.taskpriority}, Task Name: ${task.taskname}, Date: ${task.date}`;
+        function createTaskRow(task) {
+            const row = document.createElement("tr");
+            const priorityCell = document.createElement("td");
+            priorityCell.textContent = task.taskpriority;
+            const nameCell = document.createElement("td");
+            nameCell.textContent = task.taskname;
+            const dateCell = document.createElement("td");
+            dateCell.textContent = task.date;
+            const actionCell = document.createElement("td");
             const deleteButton = createDeleteButton(task.id);
-            li.appendChild(deleteButton);
-            return li;
+            actionCell.appendChild(deleteButton);
+
+            row.appendChild(priorityCell);
+            row.appendChild(nameCell);
+            row.appendChild(dateCell);
+            row.appendChild(actionCell);
+            return row;
         }
 
+        function fetchTaskList() {
+            fetch('/api/taskmanage/')
+            .then(response => response.json())
+            .then(data => {
+                const taskTable = document.getElementById("taskList");
+                const tbody = taskTable.querySelector('tbody');
+                tbody.innerHTML = "";
+
+                data.forEach(task => {
+                    const row = createTaskRow(task);
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        document.getElementById("addtaskForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+    
+            // Get form data
+            const formData = new FormData(event.target);
+            const taskname = formData.get("taskname");
+            const taskpriority = formData.get("taskpriority");
+            const date = formData.get("date");
+    
+            // Create a new task object
+            const newTask = {
+                taskname: taskname,
+                taskpriority: taskpriority,
+                date: date
+            };
+    
+            fetch('/api/taskmanage/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newTask)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // If successful, reload the task list
+                fetchTaskList();
+                document.getElementById("addtaskForm").reset();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    
+        // Fetch and display the initial list of tasks
         fetchTaskList();
     </script>
-    
 </body>
 </html>
